@@ -1,0 +1,103 @@
+# Baseline Atlantis values. Override GitHub App settings, ingress host, org allowlist, and credentials in your deployment values.
+
+atlantis-server:
+  fullnameOverride: atlantis
+  vcsSecretName: atlantis-webhook
+  githubApp:
+    id: 0
+    installationId: 0
+    slug: "your-github-app-slug"
+  github:
+    user: ""
+  orgAllowlist: "github.com/your-org"
+  atlantisUrl: "https://atlantis.example.com"
+  logLevel: info
+  allowForkPRs: false
+  allowDraftPRs: true
+  hidePrevPlanComments: true
+  hideUnchangedPlanComments: true
+  enableDiffMarkdownFormat: true
+  defaultTFVersion: "1.14.4"
+  replicaCount: 1
+  terminationGracePeriodSeconds: 300
+  lifecycle:
+    preStop:
+      exec:
+        command: ["/bin/sh", "-c", "while pgrep -x 'terraform|tofu|terragrunt' > /dev/null 2>&1; do sleep 2; done"]
+  service:
+    type: ClusterIP
+    port: 80
+    targetPort: 4141
+  statefulSet:
+    securityContext:
+      runAsUser: 1337
+      runAsGroup: 1337
+      fsGroup: 1337
+      fsGroupChangePolicy: OnRootMismatch
+  containerSecurityContext:
+    runAsNonRoot: true
+    allowPrivilegeEscalation: false
+  volumeClaim:
+    enabled: true
+    dataStorage: 50Gi
+    storageClassName: ""
+    accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 100m
+    limits:
+      memory: 2Gi
+      cpu: 1
+  podTemplate:
+    annotations:
+      secret.reloader.stakater.com/reload: "atlantis-webhook"
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    host: atlantis.example.com
+    path: /*
+    pathType: ImplementationSpecific
+    tls: []
+    annotations:
+      external-dns.alpha.kubernetes.io/target: example.com
+  environment:
+    ATLANTIS_AUTODISCOVER_MODE: disabled
+    ATLANTIS_ENABLE_REGEXP_CMD: "true"
+  extraArgs: []
+  repoConfig: |
+    repos:
+      - id: /.*/
+        branch: /.*/
+        apply_requirements: [mergeable]
+        import_requirements: [mergeable]
+        allowed_overrides: [apply_requirements, workflow, delete_source_branch_on_merge, autoplan]
+        allow_custom_workflows: true
+    workflows:
+      default:
+        plan:
+          steps:
+            - init: { extra_args: [-upgrade] }
+            - plan: { extra_args: [-refresh] }
+        apply:
+          steps: [apply]
+  config: ""
+  awsSecretName: ""
+  environmentSecrets:
+    - name: AWS_ACCESS_KEY_ID
+      secretKeyRef:
+        name: atlantis-webhook
+        key: AWS_ACCESS_KEY_ID
+    - name: AWS_SECRET_ACCESS_KEY
+      secretKeyRef:
+        name: atlantis-webhook
+        key: AWS_SECRET_ACCESS_KEY
+    - name: AWS_DEFAULT_REGION
+      secretKeyRef:
+        name: atlantis-webhook
+        key: AWS_DEFAULT_REGION
+
+onepassworditem:
+  enabled: true
+  defaultVault: ""
+  items: []
