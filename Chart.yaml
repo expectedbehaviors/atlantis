@@ -2,7 +2,7 @@ apiVersion: v2
 name: atlantis
 description: Atlantis for Terraform PR automation (upstream runatlantis chart + optional OnePasswordItem credentials).
 version: 1.0.0
-appVersion: "0.40.0"
+appVersion: "1.0.0"
 keywords:
   - terraform
   - atlantis
