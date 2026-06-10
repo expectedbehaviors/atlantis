@@ -1,0 +1,29 @@
+apiVersion: v1
+entries:
+  atlantis:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-06-10T02:40:51.731319112Z"
+    dependencies:
+    - alias: atlantis-server
+      name: atlantis
+      repository: https://runatlantis.github.io/helm-charts
+      version: 5.27.0
+    - name: onepassworditem
+      repository: https://expectedbehaviors.github.io/OnePasswordItem-helm
+      version: 1.1.1
+    description: Atlantis for Terraform PR automation (upstream runatlantis chart
+      + optional OnePasswordItem credentials).
+    digest: a9604942839b16b5b927bbe6151aa82aab58b9210c91415f562be744c5d5cd6c
+    home: https://www.runatlantis.io
+    keywords:
+    - terraform
+    - atlantis
+    - gitops
+    name: atlantis
+    sources:
+    - https://github.com/runatlantis/atlantis
+    urls:
+    - https://expectedbehaviors.github.io/atlantis/atlantis-1.0.0.tgz
+    version: 1.0.0
+generated: "2026-06-10T02:40:51.727729251Z"
